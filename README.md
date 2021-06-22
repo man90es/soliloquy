@@ -1,6 +1,6 @@
 # Soliloquy
 
-A command-line word-of-the-day-type application with a built-in dictionary of unusual, archaic, literary, poetic, formal and rarely used English words. Currently, it consists of 110 definitions but is going to grow.
+A command-line word-of-the-day-type application with a built-in dictionary of unusual, archaic, literary, poetic, formal and rarely used English words. Currently, it consists of 120 definitions but is going to grow.
 
 ![](promo_pic.png)
 
