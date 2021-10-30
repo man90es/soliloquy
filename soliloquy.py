@@ -8,55 +8,73 @@ import glob
 from pathlib import Path
 import argparse
 
+
 class cmdTags:
 	BLUE = "\033[94m"
 	BOLD = "\033[1m"
-	END  = "\033[0m"
-pass
+	END =  "\033[0m"
 
-def printRow(row, dateFmt):
+
+def print_row(row, dateFmt):
 	if len(dateFmt) > 0:
-		print("\r" + "Today is " + cmdTags.BLUE + dt.strftime(dateFmt) + cmdTags.END)
+		date_str = cmdTags.BLUE + date.today().strftime(dateFmt) + cmdTags.END
+		print("\r" + "Today is", date_str)
 	pass
 
-	print("Word of the day: " + cmdTags.BOLD + row[0] + cmdTags.END + " (" + row[1] + ") — " + row[2])
-	print()
-pass
+	word = cmdTags.BOLD + row[0] + cmdTags.END
+	pos = "(" + row[1] + ")"
+	definition = row[2]
+	print("Word of the day:", word, pos, "—", definition, "\n")
 
-# Get todays timestamp
-dt = datetime.combine(date.today(), datetime.min.time())
-timestamp = round(datetime.timestamp(dt))
 
-# Parse arguments
-parser = argparse.ArgumentParser(description="Print a word of the day")
-parser.add_argument("-n", dest="cache", action="store_const", const=False, default=True, help="Dont' use cache")
-parser.add_argument("-d", dest="dateFmt", default="%A, %B %-d", help="Specify date format")
-args = parser.parse_args()
+def get_timestamp():
+	dt = datetime.combine(date.today(), datetime.min.time())
+	return round(datetime.timestamp(dt))
 
-# Print
-li = []
-cache = Path("/tmp/wod-cache-" + str(timestamp))
-if (args.cache and cache.is_file()):
-	# Print string from cache
-	with open(cache, "r") as csvfile:
-		printRow(list(csv.reader(csvfile, delimiter="|"))[0], args.dateFmt)
-	pass
-else:
-	# Read and merge all csv files
-	for filename in glob.glob(os.path.dirname(os.path.realpath(__file__)) + "/dictionary/*.csv"):
-		with open(filename) as csvfile:
-			readerL = list(csv.reader(csvfile, delimiter="|"))
-			li += readerL
-		pass
-	pass
 
-	# Print random string
-	random.seed(timestamp)
-	chosenRow = random.choice(li)
-	printRow(chosenRow, args.dateFmt)
+def parse_args():
+	parser = argparse.ArgumentParser(description="Print a word of the day")
 
-	# Write cache
-	if (args.cache):
-		csv.writer(open(cache, "w"), delimiter="|", lineterminator="\n").writerow(chosenRow)
-	pass
-pass
+	parser.add_argument(
+		"-n", dest="n", action="store_const",
+		const=True, default=False, help="Dont' use cache"
+	)
+	parser.add_argument(
+		"-d", dest="d",
+		default="%A, %B %-d", help="Specify date format"
+	)
+
+	return parser.parse_args()
+
+
+if __name__ == "__main__":
+	timestamp = get_timestamp()
+	args = parse_args()
+	cache = Path("/tmp/wod-cache-" + str(timestamp))
+	use_cache = not args.n and cache.is_file()
+
+	# Print string from cache if it's allowed and exists
+	if (use_cache):
+		with open(cache, "r") as csvfile:
+			print_row(list(csv.reader(csvfile, delimiter="|"))[0], args.d)
+
+	# Generate a string
+	else:
+		# Read and merge all csv files
+		path = os.path.dirname(os.path.realpath(__file__)) + "/dictionary/*.csv"
+		li = []
+
+		for filename in glob.glob(path):
+			with open(filename) as csvfile:
+				readerL = list(csv.reader(csvfile, delimiter="|"))
+				li += readerL
+
+		# Print a random string
+		random.seed(timestamp)
+		chosenRow = random.choice(li)
+		print_row(chosenRow, args.d)
+
+		# Write cache
+		if (not args.n):
+			writer = csv.writer(open(cache, "w"), delimiter="|", lineterminator="\n")
+			writer.writerow(chosenRow)
