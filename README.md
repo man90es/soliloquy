@@ -1,12 +1,16 @@
 # Soliloquy
 
-A command-line word-of-the-day-type application with a built-in dictionary of unusual, archaic, literary, poetic, formal and rarely used English words. Currently, it consists of 120 definitions but is going to grow.
+A word-of-the-day service for learning unusual, archaic, literary, poetic, formal and rarely used English words.
 
-![](promo_pic.png)
+## Clients
 
-## Prerequisites
+- [Soliloquy](https://github.com/octoman90/soliloquy), a command-line client.
 
--   Python 3
+## Dependency installation
+
+```bash
+pip install -r requirements.txt --user
+```
 
 ## Usage
 
@@ -16,14 +20,13 @@ python soliloquy.py
 
 ## Flags
 
-| Flag | Description         | Default      | Notes                      |
-| ---- | ------------------- | ------------ | -------------------------- |
-| `-n` | Don't use cache     | False        | May be used for testing    |
-| `-d` | Specify date format | "%A, %B %-d" | Use "" to not display date |
+| Flag | Description     | Default | Notes                   |
+| ---- | --------------- | ------- | ----------------------- |
+| `-n` | Don't use cache | False   | May be used for testing |
 
 ## Contributing
 
-Pull requests are welcome: both for the code part and the dictionary. For major changes, please open an issue first to discuss what you would like to change.
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
 
