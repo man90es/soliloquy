@@ -4,7 +4,7 @@ A word-of-the-day service for learning unusual, archaic, literary, poetic, forma
 
 ## Clients
 
-- [Soliloquy](https://github.com/octoman90/soliloquy), a command-line client.
+- [Solilocli](https://github.com/octoman90/solilocli), a command-line client.
 
 ## Dependency installation
 
