@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from flask import Flask
+from flask import Flask, request
 import csv
 from datetime import date, datetime
 import random
@@ -32,7 +32,7 @@ def parse_args():
 
 @app.route("/", methods=["GET"])
 def get_root():
-	timestamp = get_timestamp()
+	timestamp = request.args.get("ts", default=get_timestamp(), type=int)
 	cache = Path("/tmp/wod-cache-" + str(timestamp))
 	use_cache = not args.n and cache.is_file()
 
