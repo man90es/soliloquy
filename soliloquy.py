@@ -8,6 +8,7 @@ import os
 import glob
 from pathlib import Path
 import argparse
+import json
 
 
 # Init Flask
@@ -30,6 +31,18 @@ def parse_args():
 	return parser.parse_args()
 
 
+def jsonify_row(row):
+	d = {}
+
+	i = row[0].index("/")
+	d["word"] = row[0][0:i - 1]
+	d["transcription"] = row[0][i:len(row[0])]
+	d["partOfSpeech"] = row[1]
+	d["meaning"] = row[2]
+
+	return json.dumps(d)
+
+
 @app.route("/", methods=["GET"])
 def get_root():
 	timestamp = request.args.get("ts", default=get_timestamp(), type=int)
@@ -39,7 +52,8 @@ def get_root():
 	# Print string from cache if it's allowed and exists
 	if (use_cache):
 		with open(cache, "r") as csvfile:
-			response = csvfile.readline()
+			response = list(csv.reader(csvfile, delimiter="|"))[0]
+			csv_response = "|".join(response) + "\n"
 
 	# Generate a string
 	else:
@@ -54,18 +68,30 @@ def get_root():
 
 		# Print a random string
 		random.seed(timestamp)
-		response = "|".join(random.choice(li)) + "\n"
+		response = random.choice(li)
+		csv_response = "|".join(response) + "\n"
 
 		# Write cache
-		if (not args.n):
+		if (not args.n and not cache.is_file()):
 			with open(cache, "w") as csvfile:
-				csvfile.write(response)
+				csvfile.write(csv_response)
 
-	return app.response_class(
-		response=response,
-		status=200,
-		mimetype="text/plain"
-	)
+	if request.headers["Accept"] in ["*/*", "application/json"]:
+		return app.response_class(
+			response=jsonify_row(response),
+			status=200,
+			mimetype="application/json"
+		)
+	if request.headers["Accept"] in ["text/plain"]:
+		return app.response_class(
+			response=csv_response,
+			status=200,
+			mimetype="text/plain"
+		)
+	else:
+		return app.response_class(
+			status=412
+		)
 
 
 if __name__ == "__main__":
