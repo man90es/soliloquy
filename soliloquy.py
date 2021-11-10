@@ -76,13 +76,15 @@ def get_root():
 			with open(cache, "w") as csvfile:
 				csvfile.write(csv_response)
 
-	if request.headers["Accept"] in ["*/*", "application/json"]:
+	mime = request.headers["Accept"]
+
+	if "*/*" in mime or "application/json" in mime:
 		return app.response_class(
 			response=jsonify_row(response),
 			status=200,
 			mimetype="application/json"
 		)
-	if request.headers["Accept"] in ["text/plain"]:
+	if "text/plain" in mime:
 		return app.response_class(
 			response=csv_response,
 			status=200,
