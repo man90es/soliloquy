@@ -1,18 +1,24 @@
-#!/usr/bin/python
+#!env python
 
-from flask import Flask, request
-import csv
 from datetime import date, datetime
-import random
-import os
-import glob
+from flask import Flask, request
 from pathlib import Path
 import argparse
+import csv
+import glob
 import json
+import os
+import random
+import sys
 
 
 # Init Flask
 app = Flask(__name__)
+pwd = os.path.dirname(os.path.realpath(__file__))
+dictionary_files = glob.glob(pwd + "/dictionary/*.csv")
+
+if (1 > len(dictionary_files)):
+	sys.exit("Can't find dictionary csv files in the \"dictionary\" catalogue!")
 
 
 def get_timestamp():
@@ -58,10 +64,9 @@ def get_root():
 	# Generate a string
 	else:
 		# Read and merge all csv files
-		path = os.path.dirname(os.path.realpath(__file__)) + "/dictionary/*.csv"
 		li = []
 
-		for filename in glob.glob(path):
+		for filename in dictionary_files:
 			with open(filename) as csvfile:
 				readerL = list(csv.reader(csvfile, delimiter="|"))
 				li += readerL
